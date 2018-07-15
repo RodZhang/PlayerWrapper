@@ -19,12 +19,12 @@ public class WrapperMediaPlayer extends BasePlayer {
     @Override
     public void setSource(String url) {
         super.setSource(url);
-        mMediaPlayer.setDataSource(url);
+//        mMediaPlayer.setDataSource(url);
     }
 
     @Override
     public void prepare() {
-        mMediaPlayer.prepare();
+//        mMediaPlayer.prepare();
     }
 
     @Override
