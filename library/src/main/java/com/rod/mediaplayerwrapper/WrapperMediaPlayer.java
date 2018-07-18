@@ -1,8 +1,14 @@
 package com.rod.mediaplayerwrapper;
 
 import android.media.MediaPlayer;
+import android.support.annotation.NonNull;
+import android.view.Surface;
+import android.view.SurfaceHolder;
 
 import com.rod.BasePlayer;
+import com.rod.state.StateContext;
+
+import java.io.IOException;
 
 /**
  * @author Rod
@@ -11,9 +17,27 @@ import com.rod.BasePlayer;
 public class WrapperMediaPlayer extends BasePlayer {
 
     private final MediaPlayer mMediaPlayer;
+    private final StateContext mStateContext;
 
     public WrapperMediaPlayer() {
         mMediaPlayer = new MediaPlayer();
+        mStateContext = new StateContext();
+        mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+            @Override
+            public boolean onError(MediaPlayer mp, int what, int extra) {
+                return false;
+            }
+        });
+    }
+
+    @Override
+    public void setSurfaceHolder(SurfaceHolder surfaceHolder) {
+        mMediaPlayer.setDisplay(surfaceHolder);
+    }
+
+    @Override
+    public void setSurface(Surface surface) {
+        mMediaPlayer.setSurface(surface);
     }
 
     @Override
@@ -25,6 +49,23 @@ public class WrapperMediaPlayer extends BasePlayer {
     @Override
     public void prepare() {
 //        mMediaPlayer.prepare();
+    }
+
+    @Override
+    public void playWithSource(@NonNull String url) {
+        try {
+            mMediaPlayer.setDataSource(url);
+            mMediaPlayer.prepareAsync();
+            mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    mMediaPlayer.start();
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override

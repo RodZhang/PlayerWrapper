@@ -5,8 +5,6 @@ import android.support.annotation.NonNull;
 import android.view.TextureView;
 import android.view.View;
 
-import com.rod.Player;
-
 /**
  * @author Rod
  * @date 2018/7/15
@@ -26,7 +24,7 @@ public class TextureViewHost extends BaseVideoHost {
     }
 
     @Override
-    public void attachPlayer(@NonNull Player player) {
+    public void attachPlayer(@NonNull VideoHostCallback hostCallback) {
 
     }
 }

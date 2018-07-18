@@ -23,6 +23,8 @@ public interface Player extends MinPlayer {
 
     void prepare();
 
+    void playWithSource(@NonNull String url);
+
     void stop();
 
     void release();
