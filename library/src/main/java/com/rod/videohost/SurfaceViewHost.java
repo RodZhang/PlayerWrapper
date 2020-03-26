@@ -1,7 +1,7 @@
 package com.rod.videohost;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -55,5 +55,8 @@ public class SurfaceViewHost extends BaseVideoHost implements SurfaceHolder.Call
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         PL.d(TAG, "surfaceDestroyed");
+        if (mHostCallback != null) {
+            mHostCallback.onSurfaceDestroyed();
+        }
     }
 }

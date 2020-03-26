@@ -1,7 +1,8 @@
 package com.rod;
 
-import android.support.annotation.NonNull;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
 
 import com.rod.listener.OnProgressChangeListener;
 import com.rod.listener.OnStateChangeListener;

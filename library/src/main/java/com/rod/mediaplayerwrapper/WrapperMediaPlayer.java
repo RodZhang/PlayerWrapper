@@ -1,7 +1,7 @@
 package com.rod.mediaplayerwrapper;
 
 import android.media.MediaPlayer;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
@@ -38,6 +38,10 @@ public class WrapperMediaPlayer extends BasePlayer {
     @Override
     public void setSurface(Surface surface) {
         mMediaPlayer.setSurface(surface);
+    }
+
+    @Override
+    public void onSurfaceDestroyed() {
     }
 
     @Override

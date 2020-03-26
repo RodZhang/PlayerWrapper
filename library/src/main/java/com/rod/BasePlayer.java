@@ -1,10 +1,11 @@
 package com.rod;
 
-import android.support.annotation.CallSuper;
-import android.support.annotation.NonNull;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.ViewGroup;
+
+import androidx.annotation.CallSuper;
+import androidx.annotation.NonNull;
 
 import com.rod.annotation.PlayerState;
 import com.rod.listener.OnProgressChangeListener;
@@ -28,12 +29,16 @@ public abstract class BasePlayer implements Player, VideoHostCallback {
 
     @Override
     public void attachToContainer(@NonNull ViewGroup container) {
-        mVideoHost.attachToContainer(container);
+        if (mVideoHost != null) {
+            mVideoHost.attachToContainer(container);
+        }
     }
 
     @Override
     public void detachFromContainer() {
-        mVideoHost.detachFromContainer();
+        if (mVideoHost != null) {
+            mVideoHost.detachFromContainer();
+        }
     }
 
     @Override

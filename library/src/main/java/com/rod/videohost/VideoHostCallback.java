@@ -12,4 +12,6 @@ public interface VideoHostCallback {
     void setSurface(Surface surface);
 
     void setSurfaceHolder(SurfaceHolder surfaceHolder);
+
+    void onSurfaceDestroyed();
 }
