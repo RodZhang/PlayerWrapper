@@ -12,23 +12,13 @@ import com.rod.videohost.VideoHost;
  * @author Rod
  * @date 2018/7/14
  */
-public interface Player extends MinPlayer {
+public interface Player extends PlayerOperation {
 
     void attachToContainer(@NonNull ViewGroup container);
 
     void detachFromContainer();
 
     void setVideoHost(@NonNull VideoHost videoHost);
-
-    void setSource(String url);
-
-    void prepare();
-
-    void playWithSource(@NonNull String url);
-
-    void stop();
-
-    void release();
 
     void addOnStateChangeListener(@NonNull OnStateChangeListener listener);
 
