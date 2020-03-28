@@ -1,10 +1,13 @@
 package com.rod.command;
 
+import com.rod.state.StateContext;
+
 /**
  * @author Rod
  * @date 2018/7/18
  */
 public interface Command {
 
-    void execute();
+    boolean isInvokeImmediately();
+    void execute(StateContext stateContext);
 }

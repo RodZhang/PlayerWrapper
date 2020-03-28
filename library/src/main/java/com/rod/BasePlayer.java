@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import com.rod.annotation.PlayerState;
 import com.rod.listener.OnProgressChangeListener;
 import com.rod.listener.OnStateChangeListener;
+import com.rod.log.PL;
 import com.rod.videohost.VideoHost;
 import com.rod.videohost.VideoHostCallback;
 
@@ -20,9 +21,10 @@ import java.util.List;
  * @author Rod
  * @date 2018/7/14
  */
-public abstract class BasePlayer implements Player, VideoHostCallback {
+public abstract class BasePlayer implements PlayerUserInterface, PlayerOperation, VideoHostCallback {
+    private static final String TAG = "BasePlayer";
 
-    private String mUrl;
+    protected String mUrl;
     private VideoHost mVideoHost;
     private List<OnStateChangeListener> mStateListenerList = new ArrayList<>();
     private List<OnProgressChangeListener> mProgressListenerList = new ArrayList<>();
@@ -36,6 +38,7 @@ public abstract class BasePlayer implements Player, VideoHostCallback {
 
     @Override
     public void detachFromContainer() {
+        PL.d(TAG, "detachFromContainer");
         if (mVideoHost != null) {
             mVideoHost.detachFromContainer();
         }

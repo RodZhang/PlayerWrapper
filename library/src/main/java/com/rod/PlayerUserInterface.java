@@ -12,7 +12,7 @@ import com.rod.videohost.VideoHost;
  * @author Rod
  * @date 2018/7/14
  */
-public interface Player extends PlayerOperation {
+public interface PlayerUserInterface {
 
     void attachToContainer(@NonNull ViewGroup container);
 
@@ -27,4 +27,8 @@ public interface Player extends PlayerOperation {
     void addOnProgressChangeListener(@NonNull OnProgressChangeListener listener);
 
     void removeOnProgressChangeListener(@NonNull OnProgressChangeListener listener);
+
+    void play(String url);
+
+    void release();
 }

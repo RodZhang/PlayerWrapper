@@ -1,32 +1,35 @@
 package com.rod.state;
 
+import androidx.annotation.NonNull;
+
 /**
  * @author Rod
- * @date 2020/3/28
+ * @date 2020/3/29
  */
-class BaseState implements State {
+class EndState extends BaseState {
     @Override
     public void resetPlayer(StateContext stateContext) {
-        stateContext.callPlayerReset();
     }
 
     @Override
     public void setSource(StateContext stateContext, String url) {
-        stateContext.callPlayerSetSource(url);
     }
 
     @Override
     public void prepareAsync(StateContext stateContext) {
-        stateContext.callPlayerPrepareAsync();
     }
 
     @Override
     public void start(StateContext stateContext) {
-        stateContext.callPlayerStart();
     }
 
     @Override
     public void release(StateContext stateContext) {
-        stateContext.callPlayerRelease();
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "EndState";
     }
 }
