@@ -7,19 +7,23 @@ import androidx.annotation.IntDef;
  * @date 2018/7/14
  */
 @IntDef({PlayerState.IDLE,
-        PlayerState.PREPAREING,
+        PlayerState.PREPARING,
         PlayerState.PREPARED,
-        PlayerState.BUFFERING,
+        PlayerState.BUFFER_START,
+        PlayerState.BUFFER_END,
         PlayerState.PLAYING,
         PlayerState.PAUSED,
-        PlayerState.ERROR})
+        PlayerState.ERROR,
+        PlayerState.COMPLETE})
 public @interface PlayerState {
 
     int IDLE = 0;
-    int PREPAREING = 1;
+    int PREPARING = 1;
     int PREPARED = 2;
-    int BUFFERING = 3;
-    int PLAYING = 4;
-    int PAUSED = 5;
-    int ERROR = 6;
+    int BUFFER_START = 3;
+    int BUFFER_END = 4;
+    int PLAYING = 5;
+    int PAUSED = 6;
+    int ERROR = 7;
+    int COMPLETE = 8;
 }

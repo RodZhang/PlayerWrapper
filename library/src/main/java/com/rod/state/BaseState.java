@@ -26,6 +26,11 @@ class BaseState implements State {
     }
 
     @Override
+    public void pause(StateContext stateContext) {
+        stateContext.callPlayerPause();
+    }
+
+    @Override
     public void release(StateContext stateContext) {
         stateContext.callPlayerRelease();
     }

@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
  * @author Rod
  * @date 2020/3/28
  */
-class PreparingState extends BaseState {
+public class PreparingState extends BaseState {
 
     @Override
     public void setSource(StateContext stateContext, String url) {

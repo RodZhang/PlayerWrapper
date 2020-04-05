@@ -13,5 +13,7 @@ public interface State {
 
     void start(StateContext stateContext);
 
+    void pause(StateContext stateContext);
+
     void release(StateContext stateContext);
 }

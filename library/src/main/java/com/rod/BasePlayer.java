@@ -86,13 +86,13 @@ public abstract class BasePlayer implements PlayerUserInterface, PlayerOperation
 
     }
 
-    private void onStateChange(@PlayerState int newState) {
+    protected void dispatchOnStateChanged(@PlayerState int newState) {
         for (OnStateChangeListener listener : mStateListenerList) {
             listener.onStateChanged(newState);
         }
     }
 
-    private void onProgressChange(int curPos, int totalPos) {
+    protected void dispatchOnProgressChanged(int curPos, int totalPos) {
         for (OnProgressChangeListener listener : mProgressListenerList) {
             listener.onProgressChange(curPos, totalPos);
         }

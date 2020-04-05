@@ -30,5 +30,7 @@ public interface PlayerUserInterface {
 
     void play(String url);
 
+    void pause();
+
     void release();
 }

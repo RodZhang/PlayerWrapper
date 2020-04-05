@@ -15,4 +15,16 @@ public final class PL {
             Log.d(tag, String.format(format, args));
         }
     }
+
+    public static void w(String tag, String format, Object... args) {
+        if (DEBUG_MODEL) {
+            Log.w(tag, String.format(format, args));
+        }
+    }
+
+    public static void i(String tag, String format, Object... args) {
+        if (DEBUG_MODEL) {
+            Log.i(tag, String.format(format, args));
+        }
+    }
 }

@@ -62,6 +62,13 @@ public class StateContext {
         mCurState.start(this);
     }
 
+    public void pausePlayer() {
+        if (mCurState == null) {
+            return;
+        }
+        mCurState.pause(this);
+    }
+
     public void releasePlayer() {
         if (mCurState == null) {
             return;
@@ -102,6 +109,13 @@ public class StateContext {
         mCommandInvoker.invokeNextCommand();
     }
 
+    public void callPlayerPause() {
+        PL.d(TAG, "callPlayerPause");
+        mMediaPlayer.pause();
+        changeState(new PausedState());
+        mCommandInvoker.invokeNextCommand();
+    }
+
     public void callPlayerRelease() {
         PL.d(TAG, "callPlayerRelease");
         mMediaPlayer.release();
@@ -110,6 +124,10 @@ public class StateContext {
     }
 
     private void changeState(@NonNull State newState) {
+        if (newState.getClass() == mCurState.getClass()) {
+            PL.w(TAG, "changeState, same state, return");
+            return;
+        }
         PL.d(TAG, "changeState: from [%s] to [%s]", mCurState, newState);
         mCurState = newState;
     }

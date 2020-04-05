@@ -6,8 +6,10 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 
 import com.rod.BasePlayer;
+import com.rod.annotation.PlayerState;
 import com.rod.command.Command;
 import com.rod.command.CommandInvoker;
+import com.rod.command.Pause;
 import com.rod.command.PrepareAsync;
 import com.rod.command.Release;
 import com.rod.command.Reset;
@@ -34,12 +36,41 @@ public class SafeMediaPlayer extends BasePlayer {
         StateContext stateContext = new StateContext();
         mCommandInvoker.attach(stateContext);
         stateContext.attach(mMediaPlayer, mCommandInvoker);
-        mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-            @Override
-            public boolean onError(MediaPlayer mp, int what, int extra) {
-                PL.d(TAG, "what=%d, extra=%d", what, extra);
-                return false;
+        initListeners();
+    }
+
+    private void initListeners() {
+        mMediaPlayer.setOnErrorListener((mp, what, extra) -> {
+            PL.d(TAG, "on error, what=%d, extra=%d", what, extra);
+            dispatchOnStateChanged(PlayerState.ERROR);
+            return false;
+        });
+        mMediaPlayer.setOnBufferingUpdateListener((mp, percent) -> {
+            PL.d(TAG, "on buffering updated, percent=%d", percent);
+            dispatchOnProgressChanged(mMediaPlayer.getCurrentPosition(), mMediaPlayer.getDuration());
+        });
+        mMediaPlayer.setOnVideoSizeChangedListener((mp, width, height) -> {
+            PL.d(TAG, "onVideoSizeChanged, width=%d, height=%d", width, height);
+        });
+        mMediaPlayer.setOnInfoListener((mp, what, extra) -> {
+            PL.d(TAG, "on info, what=%d, extra=%d", what, extra);
+            switch (what) {
+                case MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START:
+                    dispatchOnStateChanged(PlayerState.PLAYING);
+                    break;
+                case MediaPlayer.MEDIA_INFO_BUFFERING_START:
+                    dispatchOnStateChanged(PlayerState.BUFFER_START);
+                    break;
+                case MediaPlayer.MEDIA_INFO_BUFFERING_END:
+                    dispatchOnStateChanged(PlayerState.BUFFER_END);
+                default:
+                    break;
             }
+            return true;
+        });
+        mMediaPlayer.setOnCompletionListener(mp -> {
+            PL.d(TAG, "on complete");
+            dispatchOnStateChanged(PlayerState.COMPLETE);
         });
     }
 
@@ -80,6 +111,17 @@ public class SafeMediaPlayer extends BasePlayer {
         }
         List<Command> commands = new ArrayList<>();
         commands.add(new Start());
+        commitCommands(commands);
+    }
+
+    @Override
+    public void pause() {
+        if (!mMediaPlayer.isPlaying()) {
+            PL.i(TAG, "pause, mediaPlayer is not playing, return");
+            return;
+        }
+        List<Command> commands = new ArrayList<>();
+        commands.add(new Pause());
         commitCommands(commands);
     }
 
