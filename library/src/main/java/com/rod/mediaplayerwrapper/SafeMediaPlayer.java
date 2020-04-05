@@ -1,6 +1,8 @@
 package com.rod.mediaplayerwrapper;
 
 import android.media.MediaPlayer;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -13,9 +15,13 @@ import com.rod.command.Pause;
 import com.rod.command.PrepareAsync;
 import com.rod.command.Release;
 import com.rod.command.Reset;
+import com.rod.command.SeekTo;
 import com.rod.command.SetDataSource;
 import com.rod.command.Start;
 import com.rod.log.PL;
+import com.rod.state.PausedState;
+import com.rod.state.PreparedState;
+import com.rod.state.PreparingState;
 import com.rod.state.StateContext;
 
 import java.util.ArrayList;
@@ -30,10 +36,24 @@ public class SafeMediaPlayer extends BasePlayer {
     private final MediaPlayer mMediaPlayer = new MediaPlayer();
     private final CommandInvoker mCommandInvoker = new CommandInvoker();
     private final List<Command> mPendingCommands = new ArrayList<>();
+    private final Handler mHandler;
     private boolean mIsEnable = false;
+    private boolean mIsPlayingOnStartSeek;
 
     public SafeMediaPlayer() {
+        mHandler = new Handler(Looper.getMainLooper());
         StateContext stateContext = new StateContext();
+        stateContext.setOnStateChangedListener(newState -> {
+            mHandler.post(() -> {
+                if (newState instanceof PausedState) {
+                    dispatchOnStateChanged(PlayerState.PAUSED);
+                } else if (newState instanceof PreparingState) {
+                    dispatchOnStateChanged(PlayerState.BUFFER_START);
+                } else if (newState instanceof PreparedState) {
+                    dispatchOnStateChanged(PlayerState.BUFFER_END);
+                }
+            });
+        });
         mCommandInvoker.attach(stateContext);
         stateContext.attach(mMediaPlayer, mCommandInvoker);
         initListeners();
@@ -47,7 +67,7 @@ public class SafeMediaPlayer extends BasePlayer {
         });
         mMediaPlayer.setOnBufferingUpdateListener((mp, percent) -> {
             PL.d(TAG, "on buffering updated, percent=%d", percent);
-            dispatchOnProgressChanged(mMediaPlayer.getCurrentPosition(), mMediaPlayer.getDuration());
+            dispatchOnProgressChanged(mMediaPlayer.getCurrentPosition(), percent, mMediaPlayer.getDuration());
         });
         mMediaPlayer.setOnVideoSizeChangedListener((mp, width, height) -> {
             PL.d(TAG, "onVideoSizeChanged, width=%d, height=%d", width, height);
@@ -132,6 +152,33 @@ public class SafeMediaPlayer extends BasePlayer {
         List<Command> commands = new ArrayList<>();
         commands.add(new Release());
         commitCommands(commands);
+    }
+
+    @Override
+    public boolean isPlaying() {
+        return mMediaPlayer.isPlaying();
+    }
+
+    @Override
+    public void onStartSeek() {
+        if (mMediaPlayer.isPlaying()) {
+            List<Command> commands = new ArrayList<>();
+            commands.add(new Pause());
+            mCommandInvoker.commit(commands);
+            mIsPlayingOnStartSeek = true;
+        } else {
+            mIsPlayingOnStartSeek = false;
+        }
+    }
+
+    @Override
+    public void onEndSeek(int progress) {
+        List<Command> commands = new ArrayList<>();
+        commands.add(new SeekTo(progress));
+        if (mIsPlayingOnStartSeek) {
+            commands.add(new Start());
+            mCommandInvoker.commit(commands);
+        }
     }
 
     private void playSourceInit(String url) {

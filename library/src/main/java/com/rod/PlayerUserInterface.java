@@ -33,4 +33,10 @@ public interface PlayerUserInterface {
     void pause();
 
     void release();
+
+    boolean isPlaying();
+
+    void onStartSeek();
+
+    void onEndSeek(int progress);
 }

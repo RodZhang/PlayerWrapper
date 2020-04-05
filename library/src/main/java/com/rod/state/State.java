@@ -16,4 +16,6 @@ public interface State {
     void pause(StateContext stateContext);
 
     void release(StateContext stateContext);
+
+    void seekTo(StateContext stateContext, int targetProgress);
 }

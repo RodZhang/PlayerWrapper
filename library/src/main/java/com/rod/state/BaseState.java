@@ -34,4 +34,9 @@ class BaseState implements State {
     public void release(StateContext stateContext) {
         stateContext.callPlayerRelease();
     }
+
+    @Override
+    public void seekTo(StateContext stateContext, int targetProgress) {
+        stateContext.callPlayerSeekTo(targetProgress);
+    }
 }

@@ -92,9 +92,9 @@ public abstract class BasePlayer implements PlayerUserInterface, PlayerOperation
         }
     }
 
-    protected void dispatchOnProgressChanged(int curPos, int totalPos) {
+    protected void dispatchOnProgressChanged(int curPos, int bufferedPercent, int totalPos) {
         for (OnProgressChangeListener listener : mProgressListenerList) {
-            listener.onProgressChange(curPos, totalPos);
+            listener.onProgressChange(curPos, bufferedPercent, totalPos);
         }
     }
 }

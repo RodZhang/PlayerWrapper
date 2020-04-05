@@ -1,8 +1,9 @@
 package com.rod.videohost;
 
-import androidx.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
 
 import com.rod.Utils;
 
@@ -19,7 +20,7 @@ public abstract class BaseVideoHost implements VideoHost {
             return;
         }
         Utils.removeFromParent(videoHost);
-        container.addView(videoHost);
+        container.addView(videoHost, 0);
 
         ViewGroup.LayoutParams layoutParams = videoHost.getLayoutParams();
         layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;

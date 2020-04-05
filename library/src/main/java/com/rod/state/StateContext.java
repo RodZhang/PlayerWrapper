@@ -19,13 +19,17 @@ public class StateContext {
     private MediaPlayer mMediaPlayer;
     private State mCurState = new IdleState();
     private CommandInvoker mCommandInvoker;
+    private OnStateChangedListener mListener;
 
     public void attach(MediaPlayer player, CommandInvoker commandInvoker) {
         mCommandInvoker = commandInvoker;
         mMediaPlayer = player;
         mMediaPlayer.setOnPreparedListener(mp -> {
             PL.d(TAG, "onPrepared");
-            changeState(new PreparingState());
+            changeState(new PreparedState());
+            mCommandInvoker.invokeNextCommand();
+        });
+        mMediaPlayer.setOnSeekCompleteListener(mp -> {
             mCommandInvoker.invokeNextCommand();
         });
     }
@@ -76,6 +80,13 @@ public class StateContext {
         mCurState.release(this);
     }
 
+    public void seekToPlayer(int targetProgress) {
+        if (mCurState == null) {
+            return;
+        }
+        mCurState.seekTo(this, targetProgress);
+    }
+
     public void callPlayerReset() {
         PL.d(TAG, "callPlayerReset");
         mMediaPlayer.reset();
@@ -123,12 +134,28 @@ public class StateContext {
         mCommandInvoker.invokeNextCommand();
     }
 
+    public void callPlayerSeekTo(int targetProgress) {
+        PL.d(TAG, "callPlayerSeekTo, targetProgress=%d", targetProgress);
+        mMediaPlayer.seekTo(targetProgress);
+    }
+
+    public void setOnStateChangedListener(OnStateChangedListener listener) {
+        mListener = listener;
+    }
+
     private void changeState(@NonNull State newState) {
         if (newState.getClass() == mCurState.getClass()) {
-            PL.w(TAG, "changeState, same state, return");
+            PL.w(TAG, "changeState, same state, return, curState=%s", mCurState);
             return;
         }
         PL.d(TAG, "changeState: from [%s] to [%s]", mCurState, newState);
         mCurState = newState;
+        if (mListener != null) {
+            mListener.onStateChanged(mCurState);
+        }
+    }
+
+    public interface OnStateChangedListener {
+        void onStateChanged(State newState);
     }
 }

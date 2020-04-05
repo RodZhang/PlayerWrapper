@@ -6,5 +6,5 @@ package com.rod.listener;
  */
 public interface OnProgressChangeListener {
 
-    void onProgressChange(int curPos, int totalDuration);
+    void onProgressChange(int curPos, int bufferedPercent, int totalDuration);
 }
