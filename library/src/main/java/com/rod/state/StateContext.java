@@ -1,9 +1,13 @@
 package com.rod.state;
 
+import android.media.AudioAttributes;
 import android.media.MediaPlayer;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
+import com.rod.annotation.PlayerState;
 import com.rod.command.CommandInvoker;
 import com.rod.log.PL;
 
@@ -13,7 +17,7 @@ import java.io.IOException;
  * @author Rod
  * @date 2018/7/18
  */
-public class StateContext {
+public class StateContext implements PlayerProxy {
     private static final String TAG = "StateContext";
 
     private MediaPlayer mMediaPlayer;
@@ -39,54 +43,34 @@ public class StateContext {
     }
 
     public void resetPlayer() {
-        if (mCurState == null) {
-            return;
-        }
-        mCurState.resetPlayer(this);
+        mCurState.reset(this);
     }
 
     public void setSource(String url) {
-        if (mCurState == null) {
-            return;
-        }
-        mCurState.setSource(this, url);
+        mCurState.setDataSource(this, url);
     }
 
     public void prepareAsync() {
-        if (mCurState == null) {
-            return;
-        }
         mCurState.prepareAsync(this);
     }
 
     public void startPlayer() {
-        if (mCurState == null) {
-            return;
-        }
         mCurState.start(this);
     }
 
     public void pausePlayer() {
-        if (mCurState == null) {
-            return;
-        }
         mCurState.pause(this);
     }
 
     public void releasePlayer() {
-        if (mCurState == null) {
-            return;
-        }
         mCurState.release(this);
     }
 
     public void seekToPlayer(int targetProgress) {
-        if (mCurState == null) {
-            return;
-        }
         mCurState.seekTo(this, targetProgress);
     }
 
+    @Override
     public void callPlayerReset() {
         PL.d(TAG, "callPlayerReset");
         mMediaPlayer.reset();
@@ -94,6 +78,7 @@ public class StateContext {
         mCommandInvoker.invokeNextCommand();
     }
 
+    @Override
     public void callPlayerSetSource(String url) {
         PL.d(TAG, "callPlayerSetSource");
         try {
@@ -107,12 +92,14 @@ public class StateContext {
         }
     }
 
+    @Override
     public void callPlayerPrepareAsync() {
         PL.d(TAG, "callPlayerPrepareAsync");
         mMediaPlayer.prepareAsync();
         changeState(new PreparingState());
     }
 
+    @Override
     public void callPlayerStart() {
         PL.d(TAG, "callPlayerStart");
         mMediaPlayer.start();
@@ -120,6 +107,7 @@ public class StateContext {
         mCommandInvoker.invokeNextCommand();
     }
 
+    @Override
     public void callPlayerPause() {
         PL.d(TAG, "callPlayerPause");
         mMediaPlayer.pause();
@@ -127,6 +115,15 @@ public class StateContext {
         mCommandInvoker.invokeNextCommand();
     }
 
+    @Override
+    public void callPlayerStop() {
+        PL.d(TAG, "callPlayerStop");
+        mMediaPlayer.stop();
+        changeState(new StoppedState());
+        mCommandInvoker.invokeNextCommand();
+    }
+
+    @Override
     public void callPlayerRelease() {
         PL.d(TAG, "callPlayerRelease");
         mMediaPlayer.release();
@@ -134,6 +131,7 @@ public class StateContext {
         mCommandInvoker.invokeNextCommand();
     }
 
+    @Override
     public void callPlayerSeekTo(int targetProgress) {
         PL.d(TAG, "callPlayerSeekTo, targetProgress=%d", targetProgress);
         mMediaPlayer.seekTo(targetProgress);
@@ -150,12 +148,88 @@ public class StateContext {
         }
         PL.d(TAG, "changeState: from [%s] to [%s]", mCurState, newState);
         mCurState = newState;
-        if (mListener != null) {
-            mListener.onStateChanged(mCurState);
+        if (mListener == null) {
+            return;
+        }
+
+        int mappingState = mappingState(newState);
+        if (mappingState == -1) {
+            return;
+        }
+        mListener.onStateChanged(mappingState);
+    }
+
+    private int mappingState(State state) {
+        if (state instanceof PausedState) {
+            return PlayerState.PAUSED;
+        } else if (state instanceof PreparingState) {
+            return PlayerState.BUFFER_START;
+        } else if (state instanceof PreparedState) {
+            return PlayerState.BUFFER_END;
+        } else if (state instanceof CompletedState) {
+            return PlayerState.COMPLETE;
+        } else {
+            return -1;
         }
     }
 
+    public void onComplete() {
+        changeState(new CompletedState());
+    }
+
+    public int getCurrentPosition() {
+        if (mCurState instanceof IdleState) {
+            return 0;
+        }
+        return mMediaPlayer.getCurrentPosition();
+    }
+
+    public int getDuration() {
+        if (mCurState instanceof IdleState) {
+            return 0;
+        }
+        return mMediaPlayer.getDuration();
+    }
+
+    public int getVideoHeight() {
+        if (mCurState instanceof IdleState) {
+            return 0;
+        }
+        return mMediaPlayer.getVideoHeight();
+    }
+
+    public int getVideoWidth() {
+        if (mCurState instanceof IdleState) {
+            return 0;
+        }
+        return mMediaPlayer.getVideoWidth();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void setPlayerAudioAttributes(AudioAttributes attributes) {
+        if (mCurState instanceof IdleState) {
+            return;
+        }
+
+        mMediaPlayer.setAudioAttributes(attributes);
+    }
+
+    public void setPlayerLooping(boolean looping) {
+        if (mCurState instanceof IdleState) {
+            return;
+        }
+
+        mMediaPlayer.setLooping(looping);
+    }
+
+    public void setPlayerVolume(float leftVolume, float rightVolume) {
+        if (mCurState instanceof IdleState) {
+            return;
+        }
+        mMediaPlayer.setVolume(leftVolume, rightVolume);
+    }
+
     public interface OnStateChangedListener {
-        void onStateChanged(State newState);
+        void onStateChanged(int newState);
     }
 }

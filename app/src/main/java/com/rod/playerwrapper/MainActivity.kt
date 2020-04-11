@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity(), OnProgressChangeListener, OnStateChang
                 player.pause()
             } else {
                 player.attachToContainer(video_container)
-                player.play(videoList[1])
+                player.play(videoList[2])
             }
         }
         seek_bar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {

@@ -23,4 +23,11 @@ public class SeekTo implements Command {
     public void execute(StateContext stateContext) {
         stateContext.seekToPlayer(mTargetProgress);
     }
+
+    @Override
+    public String toString() {
+        return "Command[SeekTo{" +
+                "mTargetProgress=" + mTargetProgress +
+                "}]";
+    }
 }

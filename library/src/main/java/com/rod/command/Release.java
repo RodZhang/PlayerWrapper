@@ -1,5 +1,7 @@
 package com.rod.command;
 
+import androidx.annotation.NonNull;
+
 import com.rod.state.StateContext;
 
 /**
@@ -15,5 +17,11 @@ public class Release implements Command {
     @Override
     public void execute(StateContext stateContext) {
         stateContext.releasePlayer();
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "Command[Release]";
     }
 }

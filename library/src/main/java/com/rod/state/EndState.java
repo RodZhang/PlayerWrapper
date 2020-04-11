@@ -8,23 +8,19 @@ import androidx.annotation.NonNull;
  */
 class EndState extends BaseState {
     @Override
-    public void resetPlayer(StateContext stateContext) {
+    public void reset(PlayerProxy playerProxy) {
     }
 
     @Override
-    public void setSource(StateContext stateContext, String url) {
+    public void prepareAsync(PlayerProxy playerProxy) {
     }
 
     @Override
-    public void prepareAsync(StateContext stateContext) {
+    public void start(PlayerProxy playerProxy) {
     }
 
     @Override
-    public void start(StateContext stateContext) {
-    }
-
-    @Override
-    public void release(StateContext stateContext) {
+    public void release(PlayerProxy playerProxy) {
     }
 
     @NonNull

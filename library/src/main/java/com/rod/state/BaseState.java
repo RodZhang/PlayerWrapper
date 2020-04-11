@@ -6,37 +6,34 @@ package com.rod.state;
  */
 class BaseState implements State {
     @Override
-    public void resetPlayer(StateContext stateContext) {
-        stateContext.callPlayerReset();
+    public void reset(PlayerProxy playerProxy) {
     }
 
     @Override
-    public void setSource(StateContext stateContext, String url) {
-        stateContext.callPlayerSetSource(url);
+    public void setDataSource(PlayerProxy playerProxy, String url) {
     }
 
     @Override
-    public void prepareAsync(StateContext stateContext) {
-        stateContext.callPlayerPrepareAsync();
+    public void prepareAsync(PlayerProxy playerProxy) {
     }
 
     @Override
-    public void start(StateContext stateContext) {
-        stateContext.callPlayerStart();
+    public void start(PlayerProxy playerProxy) {
     }
 
     @Override
-    public void pause(StateContext stateContext) {
-        stateContext.callPlayerPause();
+    public void pause(PlayerProxy playerProxy) {
     }
 
     @Override
-    public void release(StateContext stateContext) {
-        stateContext.callPlayerRelease();
+    public void stop(PlayerProxy playerProxy) {
     }
 
     @Override
-    public void seekTo(StateContext stateContext, int targetProgress) {
-        stateContext.callPlayerSeekTo(targetProgress);
+    public void release(PlayerProxy playerProxy) {
+    }
+
+    @Override
+    public void seekTo(PlayerProxy playerProxy, int targetProgress) {
     }
 }

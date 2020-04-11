@@ -5,17 +5,19 @@ package com.rod.state;
  * @date 2018/7/17
  */
 public interface State {
-    void resetPlayer(StateContext stateContext);
+    void reset(PlayerProxy playerProxy);
 
-    void setSource(StateContext stateContext, String url);
+    void setDataSource(PlayerProxy playerProxy, String url);
 
-    void prepareAsync(StateContext stateContext);
+    void prepareAsync(PlayerProxy playerProxy);
 
-    void start(StateContext stateContext);
+    void start(PlayerProxy playerProxy);
 
-    void pause(StateContext stateContext);
+    void pause(PlayerProxy playerProxy);
 
-    void release(StateContext stateContext);
+    void stop(PlayerProxy playerProxy);
 
-    void seekTo(StateContext stateContext, int targetProgress);
+    void release(PlayerProxy playerProxy);
+
+    void seekTo(PlayerProxy playerProxy, int targetProgress);
 }

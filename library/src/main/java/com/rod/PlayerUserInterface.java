@@ -1,5 +1,6 @@
 package com.rod;
 
+import android.media.AudioAttributes;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -39,4 +40,19 @@ public interface PlayerUserInterface {
     void onStartSeek();
 
     void onEndSeek(int progress);
+
+    int getCurrentPosition();
+
+    int getDuration();
+
+    int getVideoHeight();
+
+    int getVideoWidth();
+
+    void setAudioAttributes(AudioAttributes attributes);
+
+    void setLooping(boolean looping);
+
+    void setVolume(float leftVolume, float rightVolume);
+
 }

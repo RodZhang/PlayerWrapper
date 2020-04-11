@@ -4,9 +4,9 @@ import androidx.annotation.NonNull;
 
 /**
  * @author Rod
- * @date 2020/3/28
+ * @date 2020/4/11
  */
-public class PreparedState extends BaseState {
+public class CompletedState extends BaseState {
 
     @Override
     public void seekTo(PlayerProxy playerProxy, int targetProgress) {
@@ -26,6 +26,6 @@ public class PreparedState extends BaseState {
     @NonNull
     @Override
     public String toString() {
-        return "PreparedState";
+        return "CompletedState";
     }
 }

@@ -7,12 +7,25 @@ import androidx.annotation.NonNull;
  * @date 2020/3/28
  */
 class StartedState extends BaseState {
+
     @Override
-    public void setSource(StateContext stateContext, String url) {
+    public void start(PlayerProxy playerProxy) {
+        playerProxy.callPlayerStart();
     }
 
     @Override
-    public void prepareAsync(StateContext stateContext) {
+    public void seekTo(PlayerProxy playerProxy, int targetProgress) {
+        playerProxy.callPlayerSeekTo(targetProgress);
+    }
+
+    @Override
+    public void stop(PlayerProxy playerProxy) {
+        playerProxy.callPlayerStop();
+    }
+
+    @Override
+    public void pause(PlayerProxy playerProxy) {
+        playerProxy.callPlayerPause();
     }
 
     @NonNull

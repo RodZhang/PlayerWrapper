@@ -9,15 +9,11 @@ import androidx.annotation.NonNull;
 class ErrorState extends BaseState {
 
     @Override
-    public void setSource(StateContext stateContext, String url) {
+    public void prepareAsync(PlayerProxy stateContext) {
     }
 
     @Override
-    public void prepareAsync(StateContext stateContext) {
-    }
-
-    @Override
-    public void start(StateContext stateContext) {
+    public void start(PlayerProxy stateContext) {
     }
 
     @NonNull

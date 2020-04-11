@@ -8,14 +8,6 @@ import androidx.annotation.NonNull;
  */
 public class PreparingState extends BaseState {
 
-    @Override
-    public void setSource(StateContext stateContext, String url) {
-    }
-
-    @Override
-    public void prepareAsync(StateContext stateContext) {
-    }
-
     @NonNull
     @Override
     public String toString() {

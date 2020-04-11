@@ -1,6 +1,8 @@
 package com.rod.mediaplayerwrapper;
 
+import android.media.AudioAttributes;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
@@ -19,9 +21,6 @@ import com.rod.command.SeekTo;
 import com.rod.command.SetDataSource;
 import com.rod.command.Start;
 import com.rod.log.PL;
-import com.rod.state.PausedState;
-import com.rod.state.PreparedState;
-import com.rod.state.PreparingState;
 import com.rod.state.StateContext;
 
 import java.util.ArrayList;
@@ -39,23 +38,18 @@ public class SafeMediaPlayer extends BasePlayer {
     private final Handler mHandler;
     private boolean mIsEnable = false;
     private boolean mIsPlayingOnStartSeek;
+    private final StateContext mStateContext;
 
     public SafeMediaPlayer() {
         mHandler = new Handler(Looper.getMainLooper());
-        StateContext stateContext = new StateContext();
-        stateContext.setOnStateChangedListener(newState -> {
+        mStateContext = new StateContext();
+        mStateContext.setOnStateChangedListener(newState -> {
             mHandler.post(() -> {
-                if (newState instanceof PausedState) {
-                    dispatchOnStateChanged(PlayerState.PAUSED);
-                } else if (newState instanceof PreparingState) {
-                    dispatchOnStateChanged(PlayerState.BUFFER_START);
-                } else if (newState instanceof PreparedState) {
-                    dispatchOnStateChanged(PlayerState.BUFFER_END);
-                }
+                dispatchOnStateChanged(newState);
             });
         });
-        mCommandInvoker.attach(stateContext);
-        stateContext.attach(mMediaPlayer, mCommandInvoker);
+        mCommandInvoker.attach(mStateContext);
+        mStateContext.attach(mMediaPlayer, mCommandInvoker);
         initListeners();
     }
 
@@ -66,8 +60,10 @@ public class SafeMediaPlayer extends BasePlayer {
             return false;
         });
         mMediaPlayer.setOnBufferingUpdateListener((mp, percent) -> {
-            PL.d(TAG, "on buffering updated, percent=%d", percent);
-            dispatchOnProgressChanged(mMediaPlayer.getCurrentPosition(), percent, mMediaPlayer.getDuration());
+            int currentPosition = getCurrentPosition();
+            int duration = getDuration();
+            PL.d(TAG, "on buffering updated, percent=%d, curPos=%d, duration=%d", percent, currentPosition, duration);
+            dispatchOnProgressChanged(currentPosition, percent, duration);
         });
         mMediaPlayer.setOnVideoSizeChangedListener((mp, width, height) -> {
             PL.d(TAG, "onVideoSizeChanged, width=%d, height=%d", width, height);
@@ -89,8 +85,10 @@ public class SafeMediaPlayer extends BasePlayer {
             return true;
         });
         mMediaPlayer.setOnCompletionListener(mp -> {
-            PL.d(TAG, "on complete");
-            dispatchOnStateChanged(PlayerState.COMPLETE);
+            int currentPosition = getCurrentPosition();
+            int duration = getDuration();
+            PL.d(TAG, "on complete, curPos=%d, duration=%d", currentPosition, duration);
+            mStateContext.onComplete();
         });
     }
 
@@ -179,6 +177,43 @@ public class SafeMediaPlayer extends BasePlayer {
             commands.add(new Start());
             mCommandInvoker.commit(commands);
         }
+    }
+
+    @Override
+    public int getCurrentPosition() {
+        return mStateContext.getCurrentPosition();
+    }
+
+    @Override
+    public int getDuration() {
+        return mStateContext.getDuration();
+    }
+
+    @Override
+    public int getVideoHeight() {
+        return mStateContext.getVideoHeight();
+    }
+
+    @Override
+    public int getVideoWidth() {
+        return mStateContext.getVideoWidth();
+    }
+
+    @Override
+    public void setAudioAttributes(AudioAttributes attributes) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mStateContext.setPlayerAudioAttributes(attributes);
+        }
+    }
+
+    @Override
+    public void setLooping(boolean looping) {
+        mStateContext.setPlayerLooping(looping);
+    }
+
+    @Override
+    public void setVolume(float leftVolume, float rightVolume) {
+        mStateContext.setPlayerVolume(leftVolume, rightVolume);
     }
 
     private void playSourceInit(String url) {

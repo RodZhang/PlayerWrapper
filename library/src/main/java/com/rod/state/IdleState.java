@@ -8,6 +8,21 @@ import androidx.annotation.NonNull;
  */
 public class IdleState extends BaseState {
 
+    @Override
+    public void reset(PlayerProxy playerProxy) {
+        playerProxy.callPlayerReset();
+    }
+
+    @Override
+    public void setDataSource(PlayerProxy playerProxy, String url) {
+        playerProxy.callPlayerSetSource(url);
+    }
+
+    @Override
+    public void release(PlayerProxy playerProxy) {
+        playerProxy.callPlayerRelease();
+    }
+
     @NonNull
     @Override
     public String toString() {
