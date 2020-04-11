@@ -63,7 +63,7 @@ public class SafeMediaPlayer extends BasePlayer {
             int currentPosition = getCurrentPosition();
             int duration = getDuration();
             PL.d(TAG, "on buffering updated, percent=%d, curPos=%d, duration=%d", percent, currentPosition, duration);
-            dispatchOnProgressChanged(currentPosition, percent, duration);
+            dispatchOnBufferChanged(percent, duration);
         });
         mMediaPlayer.setOnVideoSizeChangedListener((mp, width, height) -> {
             PL.d(TAG, "onVideoSizeChanged, width=%d, height=%d", width, height);
@@ -89,6 +89,13 @@ public class SafeMediaPlayer extends BasePlayer {
             int duration = getDuration();
             PL.d(TAG, "on complete, curPos=%d, duration=%d", currentPosition, duration);
             mStateContext.onComplete();
+        });
+
+        setTimerListener(() -> {
+            int currentPosition = getCurrentPosition();
+            int duration = getDuration();
+            PL.d(TAG, "on buffering updated, curPos=%d, duration=%d", currentPosition, duration);
+            dispatchProgressChanged(currentPosition, duration);
         });
     }
 

@@ -2,9 +2,8 @@ package com.rod.listener;
 
 /**
  * @author Rod
- * @date 2018/7/14
+ * @date 2020/4/11
  */
 public interface OnProgressChangeListener {
-
-    void onProgressChange(int curPos, int bufferedPercent, int totalDuration);
+    void onProgresschanged(int curPos, int totalPos);
 }

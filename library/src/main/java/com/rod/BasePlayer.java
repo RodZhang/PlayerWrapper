@@ -8,6 +8,7 @@ import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 
 import com.rod.annotation.PlayerState;
+import com.rod.listener.OnBufferChangeListener;
 import com.rod.listener.OnProgressChangeListener;
 import com.rod.listener.OnStateChangeListener;
 import com.rod.log.PL;
@@ -27,7 +28,9 @@ public abstract class BasePlayer implements PlayerUserInterface, PlayerOperation
     protected String mUrl;
     private VideoHost mVideoHost;
     private List<OnStateChangeListener> mStateListenerList = new ArrayList<>();
-    private List<OnProgressChangeListener> mProgressListenerList = new ArrayList<>();
+    private List<OnBufferChangeListener> mOnBufferChangeListeners = new ArrayList<>();
+    private List<OnProgressChangeListener> mOnProgressChangeListeners = new ArrayList<>();
+    private PlayerTimer mPlayerTimer = new PlayerTimer();
 
     @Override
     public void attachToContainer(@NonNull ViewGroup container) {
@@ -67,13 +70,23 @@ public abstract class BasePlayer implements PlayerUserInterface, PlayerOperation
     }
 
     @Override
-    public void addOnProgressChangeListener(@NonNull OnProgressChangeListener listener) {
-        mProgressListenerList.add(listener);
+    public void addOnBufferChangeListener(@NonNull OnBufferChangeListener listener) {
+        mOnBufferChangeListeners.add(listener);
     }
 
     @Override
-    public void removeOnProgressChangeListener(@NonNull OnProgressChangeListener listener) {
-        mProgressListenerList.remove(listener);
+    public void removeOnBufferChangeListener(@NonNull OnBufferChangeListener listener) {
+        mOnBufferChangeListeners.remove(listener);
+    }
+
+    @Override
+    public void addOnProgressChangedListener(@NonNull OnProgressChangeListener listener) {
+        mOnProgressChangeListeners.add(listener);
+    }
+
+    @Override
+    public void removeOnProgressChangedListener(@NonNull OnProgressChangeListener listener) {
+        mOnProgressChangeListeners.remove(listener);
     }
 
     @Override
@@ -86,15 +99,43 @@ public abstract class BasePlayer implements PlayerUserInterface, PlayerOperation
 
     }
 
+    protected void setTimerListener(PlayerTimer.OnTimeIntervalListener listener) {
+        mPlayerTimer.setListener(listener);
+    }
+
     protected void dispatchOnStateChanged(@PlayerState int newState) {
+        updateTimerByPlayerState(newState);
         for (OnStateChangeListener listener : mStateListenerList) {
             listener.onStateChanged(newState);
         }
     }
 
-    protected void dispatchOnProgressChanged(int curPos, int bufferedPercent, int totalPos) {
-        for (OnProgressChangeListener listener : mProgressListenerList) {
-            listener.onProgressChange(curPos, bufferedPercent, totalPos);
+    protected void dispatchOnBufferChanged(int bufferedPercent, int totalDuration) {
+        for (OnBufferChangeListener listener : mOnBufferChangeListeners) {
+            listener.onBufferChange(bufferedPercent, totalDuration);
+        }
+    }
+
+    protected void dispatchProgressChanged(int curPos, int totalDuration) {
+        for (OnProgressChangeListener listener : mOnProgressChangeListeners) {
+            listener.onProgresschanged(curPos, totalDuration);
+        }
+    }
+
+    private void updateTimerByPlayerState(@PlayerState int newState) {
+        switch (newState) {
+            case PlayerState.PLAYING:
+                mPlayerTimer.start();
+                break;
+            case PlayerState.PAUSED:
+            case PlayerState.BUFFER_START:
+            case PlayerState.COMPLETE:
+            case PlayerState.ERROR:
+            case PlayerState.IDLE:
+                mPlayerTimer.stop();
+                break;
+            default:
+                break;
         }
     }
 }

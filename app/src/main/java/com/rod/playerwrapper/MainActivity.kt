@@ -6,6 +6,7 @@ import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import com.rod.PlayerUserInterface
 import com.rod.annotation.PlayerState
+import com.rod.listener.OnBufferChangeListener
 import com.rod.listener.OnProgressChangeListener
 import com.rod.listener.OnStateChangeListener
 import com.rod.log.PL
@@ -15,7 +16,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.media_control_bar.*
 import java.util.concurrent.TimeUnit
 
-class MainActivity : AppCompatActivity(), OnProgressChangeListener, OnStateChangeListener {
+class MainActivity : AppCompatActivity(),
+        OnBufferChangeListener, OnStateChangeListener, OnProgressChangeListener {
     companion object {
         const val TAG = "MainActivity"
     }
@@ -27,8 +29,9 @@ class MainActivity : AppCompatActivity(), OnProgressChangeListener, OnStateChang
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        player.addOnProgressChangeListener(this)
+        player.addOnBufferChangeListener(this)
         player.addOnStateChangeListener(this)
+        player.addOnProgressChangedListener(this)
 
         player.setVideoHost(SurfaceViewHost(this))
         play_btn.setOnClickListener {
@@ -56,18 +59,19 @@ class MainActivity : AppCompatActivity(), OnProgressChangeListener, OnStateChang
         })
     }
 
-    override fun onProgressChange(
-            curPos: Int,
+    override fun onBufferChange(
             bufferedPercent: Int,
             totalDuration: Int
     ) {
         if (isSeeking) {
             return
         }
-        PL.d(TAG, "onProgressChange, curPos=$curPos, totalDuration=$totalDuration")
-        duration.text = "${getDurationStr(curPos)}/${getDurationStr(totalDuration)}"
         seek_bar.max = totalDuration
         seek_bar.secondaryProgress = ((bufferedPercent / 100F) * totalDuration).toInt()
+    }
+
+    override fun onProgresschanged(curPos: Int, totalPos: Int) {
+        duration.text = "${getDurationStr(curPos)}/${getDurationStr(totalPos)}"
         seek_bar.progress = curPos
     }
 
@@ -85,8 +89,9 @@ class MainActivity : AppCompatActivity(), OnProgressChangeListener, OnStateChang
     override fun onDestroy() {
         super.onDestroy()
         player.release();
-        player.removeOnProgressChangeListener(this)
+        player.removeOnBufferChangeListener(this)
         player.removeOnStateChangeListener(this)
+        player.removeOnProgressChangedListener(this)
     }
 
     private fun getDurationStr(duration: Int): String {

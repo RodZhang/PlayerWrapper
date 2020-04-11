@@ -5,6 +5,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 
+import com.rod.listener.OnBufferChangeListener;
 import com.rod.listener.OnProgressChangeListener;
 import com.rod.listener.OnStateChangeListener;
 import com.rod.videohost.VideoHost;
@@ -25,9 +26,13 @@ public interface PlayerUserInterface {
 
     void removeOnStateChangeListener(@NonNull OnStateChangeListener listener);
 
-    void addOnProgressChangeListener(@NonNull OnProgressChangeListener listener);
+    void addOnBufferChangeListener(@NonNull OnBufferChangeListener listener);
 
-    void removeOnProgressChangeListener(@NonNull OnProgressChangeListener listener);
+    void removeOnBufferChangeListener(@NonNull OnBufferChangeListener listener);
+
+    void addOnProgressChangedListener(@NonNull OnProgressChangeListener listener);
+
+    void removeOnProgressChangedListener(@NonNull OnProgressChangeListener listener);
 
     void play(String url);
 
